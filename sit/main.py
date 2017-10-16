@@ -87,19 +87,19 @@ def pull_mode(config, connector):
 
 
 def read_config(args):
-    if os.path.isfile('./sit.ini'):
-        path = './sit.ini'
-    elif os.path.isfile('~/.sit.ini'):
-        path = '~/.sit.ini'
-    elif args.get('config'):
-        if os.path.isfile(args['config']):
-            path = args['config']
-        else:
-            log.error('{}: bad config path'.format(args['config']))
-            exit(1)
-    else:
-        # no config file available
-        return {}
+    path = None
+
+    home = os.getenv('HOME')
+    try_files = [
+        './sit.ini',
+        os.path.join(home, '.sit.ini'),
+        os.path.join(home, 'sit.ini'),
+    ]
+
+    for f in try_files:
+        if os.path.isfile(f):
+            path = f
+            break
 
     config = configparser.ConfigParser()
     config.read(path)
